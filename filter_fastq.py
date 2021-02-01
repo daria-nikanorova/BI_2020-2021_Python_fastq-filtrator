@@ -1,4 +1,4 @@
-import arg_parsing as arp
+import parsargs as par
 from sys import argv
 
 # ARGUMENTS PARSING
@@ -15,7 +15,7 @@ default_args = {
 }
 
 # parse optional arguments, values will be stored in parsed_args
-parsed_args = arp.parse_args(unparsed_args, default_args.copy())
+parsed_args = par.parse_args(unparsed_args, default_args.copy())
 
 # args after parsing can be found in parsed_args:
 fastq_file = parsed_args[1]
@@ -33,5 +33,3 @@ print(f'\n{fastq_file} will be filtered with further parameters: \n'
       f'--gc_bounds = {min_gc_bound}% - {max_gc_bound}%, \n'
       f'--keep_filtered = {keep_filtered},\n'
       f'--output_base_name = {output_base_name}')
-
-print(optional_parsed_args)
