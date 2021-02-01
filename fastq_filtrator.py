@@ -27,12 +27,24 @@ def find_gc_bounds(args, ind):
     start, stop = ind + 1, ind + 2
     bounds = []
     if is_a_number(args[start]):
+        if float(args[start]) < 0:
+            print('Minimum GC content threshold must be higher or equal to 0%. \n'
+                  'Please check --gc_bounds parameters and try again \n')
+            exit()
         bounds += [float(args[start])]
         bounds += [100.0]
         if is_a_number(args[stop]):
+            if float(args[stop]) > 100:
+                print('Maximum GC content threshold must be lower or equal to 100%. \n'
+                      'Please check --gc_bounds parameters and try again')
+                exit()
             bounds[1] = float(args[stop])
         else:
-            print('NB: only minimum threshold for filtering by GC count is defined')
+            print('NB: only minimum threshold for filtering by GC count is defined \n')
+        if bounds[1] <= bounds[0]:
+            print('Maximum GC content threshold must be higher than minimum GC content threshold. \n'
+                  'Please check --gc_bounds parameters and try again')
+            exit()
     else:
         print('The first value for --gc_bounds is not numeric. Please try again')
         exit()
@@ -84,7 +96,7 @@ keep_filtered = parsed_args['--keep_filtered']
 output_base_name = parsed_args['--output_base_name']
 
 print(f'{fastq_file} will be filtered with further parameters: \n'
-      f'--min_length = {min_length}, \n'
-      f'--gc_bounds = {gc_bounds}, \n'
+      f'--min_length = {min_length}bp, \n'
+      f'--gc_bounds = {min_gc_bound}% - {max_gc_bound}%, \n'
       f'--keep_filtered = {keep_filtered},\n'
       f'--output_base_name = {output_base_name}')
