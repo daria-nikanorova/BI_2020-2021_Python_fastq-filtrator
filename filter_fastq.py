@@ -126,6 +126,7 @@ with open(fastq_file) as fastq_input:
             number_line += 1
         if keep_filtered:
             fastq_failed.close()
-
+            
 if (number_line % 4) == 0:
-    print(f"\n{number_passed_reads} out of {int(number_line/4)} read sequences passed the filtration")
+    print(f"\n{number_passed_reads} out of {int(number_line/4)} read sequences passed the filtration "
+          f"(about {round(number_passed_reads/(number_line/4) * 100, 2)} %) ")
