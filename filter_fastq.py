@@ -87,11 +87,12 @@ with open(fastq_file) as fastq_input:
                 tmp_lines_passed.append(line.rstrip())
                 count += 1
             elif count == 1:  # a read sequence line; check whether its length and GC-content pass the filtration
-                if pass_read_check(line.rstrip(), min_length, min_gc_bound, max_gc_bound):
+                read_check_flag = pass_read_check(line.rstrip(), min_length, min_gc_bound, max_gc_bound):
+                if read_check_flag:
                     tmp_lines_passed.append(line.rstrip())
                     count += 1
                     number_passed_reads += 1
-                elif (not pass_read_check(line.rstrip(), min_length, min_gc_bound, max_gc_bound)) and keep_filtered:
+                elif (not read_check_flag) and keep_filtered:
                     tmp_lines_failed.append(tmp_lines_passed[0])
                     tmp_lines_failed.append(line.rstrip())
                     count += 3
