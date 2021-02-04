@@ -66,16 +66,14 @@ def pass_read_check(read_seq, min_length, min_gc_bound, max_gc_bound):
         return False
 
 
-print(f"\nRead sequences that pass the filtration would be written to the file:\n "
-      f"{output_base_name}__passed.fastq")
-if keep_filtered:
-    print(f"\nRead sequences that fail the filtration would be written to the file:\n "
-          f"{output_base_name}__failed.fastq")
-
 print("\nThe filtration process has started. Please be patient, it will take some time.")
 
 with open(fastq_file) as fastq_input:
+    print(f"\nRead sequences that pass the filtration would be written to the file:\n "
+      f"{output_base_name}__passed.fastq")
     if keep_filtered:  # create a file to save FASTQ 4-lines blocks where reads failed the filtration (if required)
+        print(f"\nRead sequences that fail the filtration would be written to the file:\n "
+          f"{output_base_name}__failed.fastq")
         fastq_failed = open(output_base_name + '__failed.fastq', 'w')
     with open(output_base_name + '__passed.fastq', 'w') as fastq_passed:
         count = 0  # count value specifies certain line in FASTQ file
