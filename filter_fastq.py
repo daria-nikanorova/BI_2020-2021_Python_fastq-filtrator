@@ -72,7 +72,14 @@ def test_read_seq_line(read_seq):
     :param read_seq: a read sequence line from the FASTQ file.
     :return: True if a read sequence consists of A, T, C, G, or N bases, otherwise False.
     """
-    return any(base in read_seq for base in ['A', 'T', 'C', 'G', 'N'])
+    wrong_base = 0
+    for base in read_seq:
+        if base not in ['A', 'T', 'C', 'G', 'N']:
+            wrong_base+=1
+    if wrong_base > 0:
+        return False
+    else:
+        return True
 
 
 def print_error_message(fastq_file, number_line, error_header = False,
@@ -93,7 +100,7 @@ def print_error_message(fastq_file, number_line, error_header = False,
               f"\nPlease fix the file, then try again.")
     elif error_read:
         print(f"\nError! FASTQ file {fastq_file} seems to be corrupted. "
-              f"\nLine number {number_line}: a read sequence should contain bases A, T, G, C, or N. "
+              f"\nLine number {number_line}: a read sequence should contain only the following bases: A, T, G, C, or N."
               f"\nPlease fix the file, then try again.")
     elif error_sep:
         print(f"\nError! FASTQ file {fastq_file} seems to be corrupted. "
