@@ -78,11 +78,11 @@ with open(fastq_file) as fastq_input:
     with open(output_base_name + '__passed.fastq', 'w') as fastq_passed:
         count = 0  # count value specifies certain line in FASTQ file
         number_passed_reads = 0  # number of reads passed the filtration
-        number_reads = 0  # total number of reads to filter
+        number_line = 0  # number of the line
         tmp_lines_passed = []  # to save temporarily a block of 4 lines for a read passed the filtration
         tmp_lines_failed = []  # to save temporarily a block of 4 lines for a read failed the filtration (if required)
         for line in fastq_input:
-            number_reads += 1
+            number_line += 1
             if count == 0:  # a header line
                 tmp_lines_passed.append(line.rstrip())
                 count += 1
@@ -121,4 +121,4 @@ with open(fastq_file) as fastq_input:
 if keep_filtered:
     fastq_failed.close()
 
-print(f"\n{number_passed_reads} out of {number_reads} read sequences passed the filtration")
+print(f"\n{number_passed_reads} out of {number_line/4} read sequences passed the filtration")
