@@ -18,7 +18,7 @@ def parse_args(arguments, argument_dict):
     argument_dict['--output_base_name'] = file.replace('.fastq', '').split('/')[-1]
     used_args += [file]
     ind = 1
-    while ind + 1 != len(arguments):  # loop over all optional arguments except fastq file and the 1st arg (path to a script)
+    while ind + 1 != len(arguments):  # loop over all arguments except fastq file and the 1st arg (path to a script)
         arg = arguments[ind]
         next_value = arguments[ind + 1]
         if arg in used_args:  # check if argument was assigned before
@@ -204,18 +204,15 @@ def test_read_seq_line(read_seq):
     :param read_seq: a read sequence line from the FASTQ file.
     :return: True if a read sequence consists of A, T, C, G, or N bases, otherwise False.
     """
-    wrong_base = 0
     for base in read_seq:
         if base not in ['A', 'T', 'C', 'G', 'N']:
-            wrong_base += 1
-    if wrong_base > 0:
-        return False
+            return False
     else:
         return True
 
 
-def print_error_message(fastq_file, number_line, error_header = False,
-                        error_read = False, error_sep = False, error_qual = False):
+def print_error_message(fastq_file, number_line, error_header=False,
+                        error_read=False, error_sep=False, error_qual=False):
     """
     Prints out the error message if an input FASTQ file occurs to be corrupted.
     :param fastq_file: name of an input FASTQ file provided for filtering read sequences.
@@ -228,19 +225,23 @@ def print_error_message(fastq_file, number_line, error_header = False,
     """
     if error_header:
         print(f"\nError! FASTQ file {fastq_file} seems to be corrupted. "
-              f"\nLine number {number_line}: a header line should start with the '@' symbol. "
+              f"\nLine number {number_line + 1}: a header line should start with the '@' symbol. "
               f"\nPlease fix the file, then try again.")
+        exit()
     elif error_read:
         print(f"\nError! FASTQ file {fastq_file} seems to be corrupted. "
-              f"\nLine number {number_line}: a read sequence should contain only the following bases: A, T, G, C, or N."
+              f"\nLine number {number_line + 1}: a read sequence should contain only the following bases: A, T, G, C, or N."
               f"\nPlease fix the file, then try again.")
+        exit()
     elif error_sep:
         print(f"\nError! FASTQ file {fastq_file} seems to be corrupted. "
-              f"\nLine number {number_line}: a separator line should be a plus (+) sign. "
+              f"\nLine number {number_line + 1}: a separator line should be a plus (+) sign. "
               f"\nPlease fix the file, then try again.")
+        exit()
     elif error_qual:
         print(f"\nError! FASTQ file {fastq_file} seems to be corrupted. "
-              f"\nLine number {number_line}: a quality line should be of the same length as a read sequence line. "
+              f"\nLine number {number_line + 1}: a quality line should be of the same length as a read sequence line. "
               f"\nPlease fix the file, then try again.")
+        exit()
     else:
         return None
