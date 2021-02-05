@@ -166,7 +166,7 @@ def find_help():
     return
 
 
-# PART 2. READS FILTERING FUNCTIONS
+# PART 2. READS FILTRATION FUNCTIONS
 
 
 def calculate_gc(read_seq):
@@ -179,18 +179,18 @@ def calculate_gc(read_seq):
     return (read_seq.count('G') + read_seq.count('C')) * 100 / len(read_seq)
 
 
-def pass_read_check(read_seq, min_length, min_gc_bound, max_gc_bound):
+def is_read_filtered(read_seq, length, min_gc, max_gc):
     """
     Check whether a read sequence passes the filtration by its length and GC-content
     :param read_seq: a read sequence from the FASTQ file
-    :param min_length: minimum length for a read to pass the filtration
-    :param min_gc_bound: minimum GC-content value of a read to pass the filtration.
-    :param max_gc_bound: maximum GC-content of a read to pass the filtration.
+    :param length: minimum length for a read to pass the filtration
+    :param min_gc: minimum GC-content value of a read to pass the filtration.
+    :param max_gc: maximum GC-content of a read to pass the filtration.
     :return: True if a read passed the filtration parameters, otherwise False.
     """
-    if len(read_seq) >= min_length:
+    if len(read_seq) >= length:
         gc_content = calculate_gc(read_seq)
-        if (gc_content >= min_gc_bound) and (gc_content <= max_gc_bound):
+        if (gc_content >= min_gc) and (gc_content <= max_gc):
             return True
         else:
             return False
@@ -198,50 +198,131 @@ def pass_read_check(read_seq, min_length, min_gc_bound, max_gc_bound):
         return False
 
 
-def test_read_seq_line(read_seq):
+def is_correct_seq(read_seq, number_of_line, file):
     """
-    Check whether a read sequence line from the FASTQ file contains bases A, T, C, G, or N.
-    :param read_seq: a read sequence line from the FASTQ file.
-    :return: True if a read sequence consists of A, T, C, G, or N bases, otherwise False.
+    Check whether a read sequence line from the FASTQ file contains bases A, T, C, G, or N
+    :param read_seq: a read sequence line from the FASTQ file
+    :param number_of_line: number of line with seq in FASTQ file
+    :param file: FASTQ file
+    :return: True if a read sequence consists of A, T, C, G, V or N bases, otherwise False
     """
     for base in read_seq:
-        if base not in ['A', 'T', 'C', 'G', 'N']:
-            return False
-    else:
+        if base in ['A', 'T', 'C', 'G', 'N', 'V']:
+            return True
+        else:
+            print(f"\nError! FASTQ file {file} seems to be corrupted. "
+                  f"\nLine number {number_of_line}: a read sequence contains {base}, but should contain only A, T, G, C, V or N."
+                  f"\nPlease fix the file, then try again.")
+            exit()
+
+
+def is_correct_separator(separator, number_of_line, file):
+    """
+    Check whether a separator is "+"
+    :param separator: a separator line from the FASTQ file
+    :param number_of_line: number of line with separator in FASTQ file
+    :param file: FASTQ file
+    :return: True if separator is "+", otherwise False
+    """
+    if separator.rstrip() == '+':
         return True
-
-
-def print_error_message(fastq_file, number_line, error_header=False,
-                        error_read=False, error_sep=False, error_qual=False):
-    """
-    Prints out the error message if an input FASTQ file occurs to be corrupted.
-    :param fastq_file: name of an input FASTQ file provided for filtering read sequences.
-    :param number_line: specifies the number of the line that does not meet check criteria.
-    :param error_header: True if a header line does not start with the '@' symbol, otherwise False.
-    :param error_read: True if a read sequence does not contain bases A, T, G, C, or N; otherwise False.
-    :param error_sep: True if a separator line is not a plus (+) sign.
-    :param error_qual: True if a quality line is not of the same length as a read sequence line.
-    :return: None if there no error was detected in the line.
-    """
-    if error_header:
-        print(f"\nError! FASTQ file {fastq_file} seems to be corrupted. "
-              f"\nLine number {number_line + 1}: a header line should start with the '@' symbol. "
-              f"\nPlease fix the file, then try again.")
-        exit()
-    elif error_read:
-        print(f"\nError! FASTQ file {fastq_file} seems to be corrupted. "
-              f"\nLine number {number_line + 1}: a read sequence should contain only the following bases: A, T, G, C, or N."
-              f"\nPlease fix the file, then try again.")
-        exit()
-    elif error_sep:
-        print(f"\nError! FASTQ file {fastq_file} seems to be corrupted. "
-              f"\nLine number {number_line + 1}: a separator line should be a plus (+) sign. "
-              f"\nPlease fix the file, then try again.")
-        exit()
-    elif error_qual:
-        print(f"\nError! FASTQ file {fastq_file} seems to be corrupted. "
-              f"\nLine number {number_line + 1}: a quality line should be of the same length as a read sequence line. "
-              f"\nPlease fix the file, then try again.")
-        exit()
     else:
-        return None
+        print(f"\nError! FASTQ file {file} seems to be corrupted. "
+              f"\nLine number {number_of_line}: a separator line should be a plus (+) sign. "
+              f"\nPlease fix the file, then try again.")
+        exit()
+
+
+def is_correct_header(header, number_of_line, file):
+    """
+    Check whether a header starts with "@"
+    :param header: a separator line from the FASTQ file
+    :param number_of_line: number of line with header in FASTQ file
+    :param file: FASTQ file
+    :return: True if a header starts with "@", otherwise False
+    """
+    if header.startswith('@'):
+        return True
+    else:
+        print(f"\nError! FASTQ file {file} seems to be corrupted. "
+              f"\nLine number {number_of_line}: a header line should start with the '@' symbol. "
+              f"\nPlease fix the file, then try again.")
+        exit()
+
+
+def is_correct_quality_line(quality_line, read_len, number_of_line, file):
+    """
+    Check whether a quality_line has the same length as sequence
+    :param quality_line: a separator line from the FASTQ file
+    :param read_len: a length of the sequence
+    :param number_of_line: number of line with quality line in FASTQ file
+    :param file: FASTQ file
+    :return: True if a quality_line has the same length as sequence, otherwise False
+    """
+    if read_len == len(quality_line.rstrip()):
+        return True
+    else:
+        print(f"\nError! FASTQ file {file} seems to be corrupted. "
+              f"\nLine number {number_of_line}: a quality line should be of the same length as a read sequence line. "
+              f"\nPlease fix the file, then try again.")
+        exit()
+
+
+def filter_reads(file_fastq, output_basename, min_len, gc_bound_min, gc_bound_max, keep_filt):
+    """
+    Filter reads by its length and GC-content
+    :param file_fastq: the FASTQ file
+    :param output_basename: basename for output FASTQ file(s)
+    :param min_len: minimum length for a read to pass the filtration
+    :param gc_bound_min: minimum GC-content value of a read to pass the filtration
+    :param gc_bound_max: maximum GC-content of a read to pass the filtration
+    :param keep_filt: if used, reads that fail filtering will be written to file
+    :return: True if filtration process was successfully finished
+    """
+    with open(file_fastq) as fastq_input:
+        print(f"\nRead sequences that pass the filtration will be written to the file:\n "
+              f"{output_basename}__passed.fastq\n")
+        if keep_filt:
+            fastq_failed = open(output_basename + '__failed.fastq', 'w')
+            print(f"Read sequences that fail the filtration will be written to the file:\n "
+                  f"{output_basename}__failed.fastq")
+        with open(output_basename + '__passed.fastq', 'w') as fastq_passed:
+            index = 0  # current index of the line (0-3)
+            line_number = 0  # exact line number, as in input file (0-length(input file))
+            number_passed_reads = 0
+            number_all_reads = 0
+            tmp_lines = []  # to save temporarily a block of 4 lines for a read passed the filtration
+            for line in fastq_input:
+                line_number += 1
+                if (index == 0) and (is_correct_header(line.rstrip(), line_number, file_fastq)):  # a header line
+                    tmp_lines.append(line.rstrip())
+                    index += 1
+                    continue
+                if (index == 1) and (is_correct_seq(line.rstrip(), line_number, file_fastq)):  # a sequence line
+                    number_all_reads += 1
+                    read_passed_filtration = is_read_filtered(line.rstrip(), min_len, gc_bound_min, gc_bound_max)
+                    tmp_lines.append(line.rstrip())
+                    read_length = len(line.rstrip())
+                    index += 1
+                    continue
+                if (index == 2) and (is_correct_separator(line.rstrip(), line_number, file_fastq)):  # a separator line
+                    tmp_lines.append(line.rstrip())
+                    index += 1
+                    continue
+                if (index == 3) and (is_correct_quality_line(line.rstrip(), read_length, line_number, file_fastq)):  # a quality line
+                    tmp_lines.append(line.rstrip())
+                if read_passed_filtration:
+                    number_passed_reads += 1
+                    fastq_passed.write('\n'.join(tmp_lines) + '\n')
+                elif not read_passed_filtration and keep_filt:
+                    fastq_failed.write('\n'.join(tmp_lines) + '\n')
+                tmp_lines = []
+                index = 0
+            if keep_filt:
+                fastq_failed.close()
+    print(f"\n{number_passed_reads} out of {number_all_reads} read sequences passed the filtration "
+          f"(about {round(number_passed_reads / number_all_reads * 100, 2)}%) ")
+    pass
+
+
+
