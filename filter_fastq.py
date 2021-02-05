@@ -14,7 +14,7 @@ default_args = {
     '--output_base_name': ''
 }
 
-# parse optional arguments, values will be stored in parsed_args
+# parse arguments, values will be stored in parsed_args
 parsed_args = par.parse_args(unparsed_args, default_args.copy())
 
 # args after parsing can be found in parsed_args:
@@ -57,11 +57,10 @@ with open(fastq_file) as fastq_input:
                     tmp_lines_passed.append(line.rstrip())
                     count += 1
                 else:
-                    print_error_message(fastq_file, number_line, error_header = True)
-                    break
+                    par.print_error_message(fastq_file, number_line, error_header=True)
             elif count == 1:  # a read sequence line; check whether its length and GC-content pass the filtration
-                if test_read_seq_line(line.rstrip()):  # test if a read sequence line contains A, T, C, G, or N bases
-                    read_check_flag = pass_read_check(line.rstrip(), min_length, min_gc_bound, max_gc_bound)
+                if par.test_read_seq_line(line.rstrip()):  # test if a read sequence line contains A, T, C, G, or N bases
+                    read_check_flag = par.pass_read_check(line.rstrip(), min_length, min_gc_bound, max_gc_bound)
                     if read_check_flag:
                         tmp_lines_passed.append(line.rstrip())
                         count += 1
@@ -71,18 +70,16 @@ with open(fastq_file) as fastq_input:
                         tmp_lines_failed.append(line.rstrip())
                         count += 3
                     else:
-                        tmp_lines_failed.append(line.rstrip()) # save only a read to further check the quality line
+                        tmp_lines_failed.append(line.rstrip())  # save only a read to further check the quality line
                         count += 5
                 else:
-                    print_error_message(fastq_file, number_line, error_read = True)
-                    break
+                    par.print_error_message(fastq_file, number_line, error_read=True)
             elif count == 2:  # "+" line, from a 4-lines block where a read passed the filtration
                 if line.rstrip() == '+':  # test if a separator line is a plus (+) sign
                     count += 1
                     tmp_lines_passed.append(line.rstrip())
                 else:
-                    print_error_message(fastq_file, number_line, error_sep = True)
-                    break
+                    par.print_error_message(fastq_file, number_line, error_sep=True)
             elif count == 3:  # quality line, from a 4-lines block where a read passed the filtration
                 if len(tmp_lines_passed[1]) == len(line.rstrip()):  # compare the length of quality and read lines
                     tmp_lines_passed.append(line.rstrip())
@@ -90,15 +87,13 @@ with open(fastq_file) as fastq_input:
                     tmp_lines_passed = []
                     count = 0
                 else:
-                    print_error_message(fastq_file, number_line, error_sep = True)
-                    break
+                    par.print_error_message(fastq_file, number_line, error_sep=True)
             elif count == 4:  # "+" line, from a 4-lines block where a read failed the filtration; keep failed reads
                 if line.rstrip() == '+':  # test if a separator line is a plus (+) sign
                     tmp_lines_failed.append(line.rstrip())
                     count += 1
                 else:
-                    print_error_message(fastq_file, number_line, error_sep = True)
-                    break
+                    par.print_error_message(fastq_file, number_line, error_sep=True)
             elif count == 5:  # quality line, from a 4-lines block where a read failed the filtration; keep failed reads
                 if len(tmp_lines_failed[1]) == len(line.rstrip()):  # compare the length of quality and read lines
                     tmp_lines_failed.append(line.rstrip())
@@ -107,26 +102,23 @@ with open(fastq_file) as fastq_input:
                     tmp_lines_passed = []
                     count = 0
                 else:
-                    print_error_message(fastq_file, number_line, error_qual = True)
-                    break
+                    par.print_error_message(fastq_file, number_line, error_qual=True)
             elif count == 6:  # "+" line, from a 4-lines block where a read failed the filtration; not save to a file
                 if line.rstrip() == '+':  # test if a separator line is a plus (+) sign
                     count += 1
                 else:
-                    print_error_message(fastq_file, number_line, error_sep = True)
-                    break
+                    par.print_error_message(fastq_file, number_line, error_sep=True)
             elif count == 7:  # quality line, from a 4-line block where a read failed the filtration; not save to a file
                 if len(tmp_lines_failed[0]) == len(line.rstrip()):  # compare the length of quality and read lines
                     tmp_lines_failed = []
                     tmp_lines_passed = []
                     count = 0
                 else:
-                    print_error_message(fastq_file, number_line, error_qual = True)
-                    break
+                    par.print_error_message(fastq_file, number_line, error_qual=True)
             number_line += 1
         if keep_filtered:
             fastq_failed.close()
-            
+
 if (number_line % 4) == 0:
     print(f"\n{number_passed_reads} out of {int(number_line/4)} read sequences passed the filtration "
-          f"(about {round(number_passed_reads/(number_line/4) * 100, 2)} %) ")
+          f"(about {round(number_passed_reads/(number_line/4) * 100, 2)}%) ")
