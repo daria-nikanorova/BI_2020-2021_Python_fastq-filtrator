@@ -71,7 +71,7 @@ def filter_reads(file_fastq, output_basename, min_length, min_gc_bound, max_gc_b
     :param min_gc_bound: minimum GC-content value of a read to pass the filtration
     :param max_gc_bound: maximum GC-content of a read to pass the filtration
     :param keep_filt: if used, reads that fail filtering will be written to file
-    :return: True if filtration process was successfully finished
+    :return: number_passed_reads, number_all_reads if filtration process was successfully finished
     """
     number_passed_reads = 0
     number_all_reads = 0
