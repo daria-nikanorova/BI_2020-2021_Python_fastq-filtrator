@@ -74,7 +74,7 @@ class TestFilteringFunctions(unittest.TestCase):
     def test_calculate_gc_zero_length(self):
         self.assertRaises(ValueError, calculate_gc, '')
 
-        def test_is_filtered_min_gc_included(self):
+    def test_is_filtered_min_gc_included(self):
         self.assertTrue(is_filtered(self.sequence, min_length=13, min_gc_bound=42.857142857142854, max_gc_bound=50))
 
     def test_is_filtered_max_gc_included(self):
