@@ -117,6 +117,5 @@ def filter_reads(file_fastq, output_basename, min_length, min_gc_bound, max_gc_b
 
                 index = 0
                 read = list()
-    print(f"\n{number_passed_reads} out of {number_all_reads} read sequences passed the filtration "
-          f"(about {round(number_passed_reads / number_all_reads * 100, 2)}%) ")
+    return number_passed_reads, number_all_reads
 
