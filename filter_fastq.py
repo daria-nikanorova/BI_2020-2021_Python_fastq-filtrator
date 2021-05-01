@@ -1,4 +1,5 @@
-import parsargs as par
+import parsing_functions
+import filtering_functions
 from sys import argv
 
 # ARGUMENTS PARSING
@@ -6,16 +7,8 @@ from sys import argv
 # the arguments are stored in sys.argv
 unparsed_args = argv
 
-# a dict that contains all optional arguments and their values by default
-default_args = {
-    '--min_length': 0,
-    '--gc_bounds': [0.0, 100.0],
-    '--keep_filtered': False,
-    '--output_base_name': ''
-}
-
 # parse arguments, values will be stored in parsed_args
-parsed_args = par.parse_args(unparsed_args, default_args.copy())
+parsed_args = parsing_functions.parse_args(unparsed_args)
 
 # args after parsing can be found in parsed_args:
 fastq_file = parsed_args[1]
@@ -38,10 +31,10 @@ print(f'\n{fastq_file} will be filtered with further parameters: \n'
 
 print("\nThe filtration process has started. Please be patient, it will take some time.")
 
-number_passed_reads, number_all_reads = par.filter_reads(fastq_file, output_base_name, min_length, min_gc_bound, max_gc_bound, keep_filtered)
+number_passed_reads, number_all_reads = filtering_functions.filter_reads(fastq_file, output_base_name, min_length, min_gc_bound, max_gc_bound, keep_filtered)
 
 print(f"\n{number_passed_reads} out of {number_all_reads} read sequences passed the filtration "
-          f"(about {round(number_passed_reads / number_all_reads * 100, 2)}%) ")
+      f"(about {round(number_passed_reads / number_all_reads * 100, 2)}%) ")
 
 print('\nThank you for using filter_fastq.py!')
 
