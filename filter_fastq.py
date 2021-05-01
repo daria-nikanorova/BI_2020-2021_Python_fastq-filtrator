@@ -38,7 +38,10 @@ print(f'\n{fastq_file} will be filtered with further parameters: \n'
 
 print("\nThe filtration process has started. Please be patient, it will take some time.")
 
-par.filter_reads(fastq_file, output_base_name, min_length, min_gc_bound, max_gc_bound, keep_filtered)
+number_passed_reads, number_all_reads = par.filter_reads(fastq_file, output_base_name, min_length, min_gc_bound, max_gc_bound, keep_filtered)
+
+print(f"\n{number_passed_reads} out of {number_all_reads} read sequences passed the filtration "
+          f"(about {round(number_passed_reads / number_all_reads * 100, 2)}%) ")
 
 print('\nThank you for using filter_fastq.py!')
 
