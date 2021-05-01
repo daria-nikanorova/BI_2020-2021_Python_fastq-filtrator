@@ -55,7 +55,7 @@ def calculate_gc(read_seq):
     :param read_seq: a read sequence from the FASTQ file
     :return: GC-content of a read sequence, %
     """
-    if len(read_seq[1]) > 0:
+    if len(read_seq) > 0:
         return (read_seq.count('G') + read_seq.count('C')) * 100 / len(read_seq)
     else:
         raise ValueError('A sequence of zero length was found.\n'
