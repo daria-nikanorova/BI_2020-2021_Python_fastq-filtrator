@@ -7,24 +7,24 @@ path = "/home/daria/Documents/git_repos/BI_2020-2021_Python_fastq-filtrator/"
 
 
 class TestGcBounds(unittest.TestCase):
+    def setUp(self):
+        self.ind = 1
+
     def test_gc_bound_with_min_and_max_thresholds(self):
         args = ["filter_fastq.py", "--gc_bounds", "30", "70", "test_file.fastq"]
-        ind = 1
 
-        self.assertEqual(parsing_functions.get_gc_bounds(args, ind), ([30, 70], 3))
+        self.assertEqual(parsing_functions.get_gc_bounds(args, self.ind), ([30, 70], 3))
 
     def test_get_gc_bounds_with_only_min_threshold(self):
         args = ["filter_fastq.py", "--gc_bounds", "50", "some_word", "test_file.fastq"]
-        ind = 1
 
-        self.assertEqual(parsing_functions.get_gc_bounds(args, ind), ([50, 100], 2))
+        self.assertEqual(parsing_functions.get_gc_bounds(args, self.ind), ([50, 100], 2))
 
     def test_get_gc_bounds_with_negative_min_threshold(self):
         args = ["filter_fastq.py", "--gc_bounds", "-5", "50", "test_file.fastq"]
-        ind = 1
 
         with self.assertRaises(ValueError) as ctx:
-            parsing_functions.get_gc_bounds(args, ind)
+            parsing_functions.get_gc_bounds(args, self.ind)
         obtained_msg = ctx.exception.args[0]
         expected_msg = '\nMinimum GC content threshold must be higher or equal to 0%. \n' \
                        'Please check --gc_bounds parameters and try again'
@@ -32,10 +32,9 @@ class TestGcBounds(unittest.TestCase):
 
     def test_get_gc_bounds_with_not_int_value(self):
         args = ["filter_fastq.py", "--gc_bounds", "as", "50", "test_file.fastq"]
-        ind = 1
 
         with self.assertRaises(ValueError) as ctx:
-            parsing_functions.get_gc_bounds(args, ind)
+            parsing_functions.get_gc_bounds(args, self.ind)
         obtained_msg = ctx.exception.args[0]
         expected_msg = '\nMinimum GC content threshold for filtering must be a positive float number. \n' \
                        'Please check --min_length parameter and try again'
@@ -43,12 +42,11 @@ class TestGcBounds(unittest.TestCase):
 
     def test_get_gc_bounds_with_max_threshold_higher_than_100(self):
         args = ["filter_fastq.py", "--gc_bounds", "10", "150", "test_file.fastq"]
-        ind = 1
 
-        self.assertRaises(ValueError, parsing_functions.get_gc_bounds, args, ind)
+        self.assertRaises(ValueError, parsing_functions.get_gc_bounds, args, self.ind)
 
         with self.assertRaises(ValueError) as ctx:
-            parsing_functions.get_gc_bounds(args, ind)
+            parsing_functions.get_gc_bounds(args, self.ind)
         obtained_msg = ctx.exception.args[0]
         expected_msg = '\nMaximum GC content threshold must be lower or equal to 100%. \n' \
                        'Please check --gc_bounds parameters and try again'
@@ -56,10 +54,9 @@ class TestGcBounds(unittest.TestCase):
 
     def test_get_gc_bounds_with_min_threshold_higher_than_max_threshold(self):
         args = ["filter_fastq.py", "--gc_bounds", "105", "15", "test_file.fastq"]
-        ind = 1
 
         with self.assertRaises(ValueError) as ctx:
-            parsing_functions.get_gc_bounds(args, ind)
+            parsing_functions.get_gc_bounds(args, self.ind)
         obtained_msg = ctx.exception.args[0]
         expected_msg = '\nMaximum GC content threshold must be higher than minimum GC content threshold. \n' \
                        'Please check --gc_bounds parameters and try again'
@@ -67,12 +64,14 @@ class TestGcBounds(unittest.TestCase):
 
 
 class TestGetMinLength(unittest.TestCase):
+    def setUp(self):
+        self.ind = 1
+
     def test_get_min_length_with_not_int_value(self):
         args = ["filter_fastq.py", "--min_length", "some_word", "test_file.fastq"]
-        ind = 1
 
         with self.assertRaises(ValueError) as ctx:
-            parsing_functions.get_min_length(args, ind)
+            parsing_functions.get_min_length(args, self.ind)
         obtained_msg = ctx.exception.args[0]
         expected_msg = '\nLength for filtering must be of integer type. \n' \
                        'Please check --min_length parameters and try again'
@@ -80,10 +79,9 @@ class TestGetMinLength(unittest.TestCase):
 
     def test_get_min_length_with_negative_min_threshold(self):
         args = ["filter_fastq.py", "--min_length", "-50", "test_file.fastq"]
-        ind = 1
 
         with self.assertRaises(ValueError) as ctx:
-            parsing_functions.get_min_length(args, ind)
+            parsing_functions.get_min_length(args, self.ind)
         obtained_msg = ctx.exception.args[0]
         expected_msg = '\nLength for filtering must be a positive integer. \n' \
                        'Please check --min_length parameters and try again'
